@@ -1,0 +1,119 @@
+!-------------------------------------------------------------------------------
+!-- INITIALIZATION PARAMETER NAMELIST
+!   Documentation: https://palm.muk.uni-hannover.de/trac/wiki/doc/app/inipar
+!-------------------------------------------------------------------------------
+&initialization_parameters
+!
+!-- grid parameters
+!-------------------------------------------------------------------------------
+    nx                         = 639, ! Number of gridboxes in x-direction (nx+1)
+    ny                         = 1199, ! Number of gridboxes in y-direction (ny+1)
+    nz                         = 90, ! Number of gridboxes in z-direction (nz)
+
+    dx                         = 25.0, ! Size of single gridbox in x-direction
+    dy                         = 25.0, ! Size of single gridbox in y-direction
+    dz                         = 25.0, ! Size of single gridbox in z-direction
+
+    dz_stretch_level           = 1225.0, ! Height (in m) where stretching starts
+    dz_stretch_factor          = 1.08,   ! dz(k+1) = dz(k) * dz_stretch_factor
+!
+!-- initialization
+!-------------------------------------------------------------------------------
+    initializing_actions       = 'set_constant_profiles', ! initial conditions
+
+    ug_surface                 = 5.0, ! u-comp of geostrophic wind at surface
+    vg_surface                 = 0.0, ! v-comp of geostrophic wind at surface
+
+    pt_surface                 = 300.0, ! initial surface potential temp
+
+    pt_vertical_gradient       =    0.0,
+                                    1.0, ! piecewise temp gradients
+    pt_vertical_gradient_level =    0.0,
+                                  800.0, ! height level of temp gradients
+
+
+!
+!-- boundary conditions
+!-------------------------------------------------------------------------------
+    surface_heatflux           = 0.1, ! sensible heat flux at the bottom surface
+    bc_pt_b                    = 'neumann', ! required with surface_heatflux
+    
+    bc_uv_b                    = 'dirichlet'  !no-slip boundary condition at bottom
+    bc_uv_t                    = 'dirichlet'  !Dirichlet at top
+!
+!-- numerics
+!-------------------------------------------------------------------------------
+    fft_method                 = 'fftw',   ! build-in fft method
+    
+!
+!-- topography
+!-------------------------------------------------------------------------------
+	topography = 'read_from_file',
+	topography_grid_convention = 'cell_center',  / ! default
+ 
+
+/ ! end of initialization parameter namelist
+
+!-------------------------------------------------------------------------------
+!-- RUNTIME PARAMETER NAMELIST
+!   Documentation: https://palm.muk.uni-hannover.de/trac/wiki/doc/app/d3par
+!-------------------------------------------------------------------------------
+&runtime_parameters
+!
+!-- run steering
+!-------------------------------------------------------------------------------
+    end_time                   = 14400.0, ! simulation time of the 3D model
+
+    create_disturbances        = .TRUE., ! randomly perturbate horiz. velocity
+    dt_disturb                 = 150.0,  ! interval for random perturbations
+    disturbance_energy_limit   = 0.01,   ! upper limit for perturbation energy
+
+    data_output_2d_on_each_pe  = .FALSE., ! don't do 2D output on each MPI rank
+    npex = 10
+    npey = 20
+
+!
+!-- data output
+!-------------------------------------------------------------------------------
+    netcdf_data_format         = 4, ! use NetCDF4
+
+    dt_run_control             = 0.0,    ! output interval for run control
+    dt_data_output             = 1800.0,  ! output interval for general data
+    dt_data_output_av          = 1800.0, ! output interval for averaged data
+    dt_dopr                    = 900.0,  ! output interval for profile data
+
+    data_output                = 'w_xy','w_xy_av'
+                                 'w_yz',
+                                 'w_yz_av',
+                                 'theta_xy',
+                                 'theta_yz',
+                                 'u_xy','u_xy_av',
+                                 'u_yz','u_yz_av',
+                                 'e_xy_av','e_yz_av','ti_xy_av','ti_yz_av',
+                                 'v_xy_av','v_yz_av',
+
+
+                                 
+
+    data_output_pr             = 'wtheta', 'w"theta"', 'w*theta*',
+                                 'w*2',
+                                 '#theta', 'theta*2',
+
+    section_xy                 = 4, 8, 12, 16, 20! grid index for 2D XY cross sections
+    section_yz                 = 4, 160, 320, 480, 639! grid index for 2D YZ cross sections
+
+    averaging_interval         = 900.0, ! averaging interval general data
+    dt_averaging_input         = 10.0,  ! averaging general data sampling rate
+
+    averaging_interval_pr      = 600.0, ! averaging interval profile data
+    dt_averaging_input_pr      = 10.0,  ! averaging profile data sampling rate
+
+/ ! end of runtime parameter namelist
+
+
+&user_parameters
+
+  data_output_user = 'u2_xy_av','u2_yz_av','v2_xy_av','v2_yz_av','w2_xy_av','w2_yz_av',
+
+/
+
